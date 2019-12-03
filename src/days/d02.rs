@@ -42,7 +42,7 @@ pub fn d02a() -> String {
 
 pub fn d02b() -> String {
     let (noun, verb) = (0usize..100)
-        .flat_map(|i| (0usize..100).map(move |j| (i, j)))
+        .flat_map(|j| (0usize..100).map(move |i| (i, j)))
         .find(|(n, v)| run_program(parse_input(), *n, *v)[0] == 19690720)
         .unwrap();
 
