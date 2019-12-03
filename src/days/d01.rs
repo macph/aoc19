@@ -2,10 +2,7 @@ fn parse_input() -> Vec<i32> {
     let data = include_bytes!("d01.txt");
     String::from_utf8_lossy(data)
         .split('\n')
-        .filter_map(|s| match s.parse::<i32>() {
-            Ok(m) => Some(m),
-            Err(_) => None,
-        })
+        .filter_map(|s| s.parse::<i32>().ok())
         .collect()
 }
 
@@ -25,14 +22,11 @@ pub fn d01b() -> String {
     parse_input()
         .iter()
         .map(|&mass| {
-            let mut m = mass;
             let mut total = 0;
-            loop {
-                m = fuel_required(m);
-                if m <= 0 {
-                    break;
-                }
+            let mut m = fuel_required(mass);
+            while m > 0 {
                 total += m;
+                m = fuel_required(m);
             }
             total
         })
