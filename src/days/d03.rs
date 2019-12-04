@@ -1,3 +1,6 @@
+/// Advent of Code 2019, day 3
+/// https://adventofcode.com/2019/day/3
+
 use std::collections::HashMap;
 
 type Coord = (i32, i32);

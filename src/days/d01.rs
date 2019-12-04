@@ -1,3 +1,6 @@
+/// Advent of Code 2019, day 1
+/// https://adventofcode.com/2019/day/1
+
 fn parse_input() -> Vec<i32> {
     let data = include_bytes!("d01.txt");
     String::from_utf8_lossy(data)

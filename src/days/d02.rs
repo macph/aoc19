@@ -1,3 +1,6 @@
+/// Advent of Code 2019, day 2
+/// https://adventofcode.com/2019/day/2
+
 fn parse_input() -> Vec<usize> {
     let data = include_bytes!("d02.txt");
     String::from_utf8_lossy(data)
