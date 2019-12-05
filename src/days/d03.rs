@@ -1,6 +1,5 @@
 /// Advent of Code 2019, day 3
 /// https://adventofcode.com/2019/day/3
-
 use std::collections::HashMap;
 
 type Coord = (i32, i32);
@@ -120,7 +119,7 @@ impl Grid {
 }
 
 fn parse_input() -> Vec<Vec<Move>> {
-    let data = include_bytes!("d03.txt");
+    let data = include_bytes!("input/d03.txt");
     String::from_utf8_lossy(data)
         .split('\n')
         .map(|s| s.split(',').map(|c| Move::from_str(c)).collect())

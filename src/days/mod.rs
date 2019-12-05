@@ -1,5 +1,4 @@
 /// Collect all problems into a list to be iterated over
-
 mod d01;
 mod d02;
 mod d03;

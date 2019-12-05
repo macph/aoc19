@@ -2,7 +2,7 @@
 /// https://adventofcode.com/2019/day/2
 
 fn parse_input() -> Vec<usize> {
-    let data = include_bytes!("d02.txt");
+    let data = include_bytes!("input/d02.txt");
     String::from_utf8_lossy(data)
         .split(',')
         .map(|i| i.parse::<usize>().unwrap())

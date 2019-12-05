@@ -2,7 +2,7 @@
 /// https://adventofcode.com/2019/day/1
 
 fn parse_input() -> Vec<i32> {
-    let data = include_bytes!("d01.txt");
+    let data = include_bytes!("input/d01.txt");
     String::from_utf8_lossy(data)
         .split('\n')
         .filter_map(|s| s.parse::<i32>().ok())
