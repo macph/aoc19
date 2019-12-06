@@ -4,12 +4,14 @@ mod d02;
 mod d03;
 mod d04;
 mod d05;
+mod d06;
 
 use d01::{d01a, d01b};
 use d02::{d02a, d02b};
 use d03::{d03a, d03b};
 use d04::{d04a, d04b};
 use d05::{d05a, d05b};
+use d06::{d06a, d06b};
 
 pub type Solver = dyn Fn() -> String + Send + Sync + 'static;
 
@@ -20,5 +22,6 @@ lazy_static! {
         vec![&d03a, &d03b],
         vec![&d04a, &d04b],
         vec![&d05a, &d05b],
+        vec![&d06a, &d06b],
     ];
 }
