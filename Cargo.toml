@@ -9,4 +9,5 @@ edition = "2018"
 
 [dependencies]
 clap = "~2.33.0"
+itertools = "~0.8.2"
 lazy_static = "~1.4.0"
