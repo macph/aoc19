@@ -1,7 +1,8 @@
-/// Advent of Code 2019, day 5
-/// https://adventofcode.com/2019/day/5
+/// Advent of Code 2019, day 7
+/// https://adventofcode.com/2019/day/7
 use itertools::Itertools;
 use std::collections::VecDeque;
+use std::iter::once;
 
 enum Mode {
     IMMEDIATE,
@@ -32,8 +33,8 @@ impl Intcode {
         self.state[self.pointer]
     }
 
-    fn read_mode(&self, index: usize) -> Mode {
-        let modes = self.state[self.pointer] / 100;
+    fn read_mode(&self, position: usize, index: usize) -> Mode {
+        let modes = self.state[position] / 100;
         if (modes / 10_i32.pow(index as u32)) % 10 > 0 {
             Mode::IMMEDIATE
         } else {
@@ -41,75 +42,95 @@ impl Intcode {
         }
     }
 
-    fn read(&self, offset: usize) -> i32 {
-        match self.read_mode(offset - 1) {
-            Mode::IMMEDIATE => self.state[self.pointer + offset],
-            Mode::POSITION if self.state[self.pointer] >= 0 => {
-                self.state[self.state[self.pointer + offset] as usize]
+    fn read(&self, position: usize, offset: usize) -> i32 {
+        match self.read_mode(position, offset - 1) {
+            Mode::IMMEDIATE => self.state[position + offset],
+            Mode::POSITION if self.state[position] >= 0 => {
+                self.state[self.state[position + offset] as usize]
             }
             Mode::POSITION => panic!(
                 "Integer {} is to be used as index but is negative.",
-                self.state[self.pointer]
+                self.state[position]
             ),
         }
     }
 
-    fn write(&mut self, offset: usize, value: i32) {
-        if self.state[self.pointer + offset] >= 0 {
-            let index = self.state[self.pointer + offset] as usize;
+    fn write(&mut self, position: usize, value: i32) {
+        if self.state[position] >= 0 {
+            let index = self.state[position] as usize;
             self.state[index] = value;
         } else {
             panic!(
                 "Integer {} is to be used as index but is negative.",
-                self.state[self.pointer + offset]
+                self.state[position]
             );
         }
     }
 
     fn add(&mut self) {
-        self.write(3, self.read(1) + self.read(2));
+        self.write(
+            self.pointer + 3,
+            self.read(self.pointer, 1) + self.read(self.pointer, 2),
+        );
         self.pointer += 4;
     }
 
     fn multiply(&mut self) {
-        self.write(3, self.read(1) * self.read(2));
+        self.write(
+            self.pointer + 3,
+            self.read(self.pointer, 1) * self.read(self.pointer, 2),
+        );
         self.pointer += 4;
     }
 
     fn write_input(&mut self) {
         let v = self.input.pop_front().unwrap();
-        self.write(1, v);
+        self.write(self.pointer + 1, v);
         self.pointer += 2;
     }
 
     fn read_output(&mut self) {
-        self.output.push_back(self.read(1));
+        self.output.push_back(self.read(self.pointer, 1));
         self.pointer += 2;
     }
 
     fn jump_if_true(&mut self) {
-        if self.read(1) != 0 {
-            self.pointer = self.read(2) as usize;
+        if self.read(self.pointer, 1) != 0 {
+            self.pointer = self.read(self.pointer, 2) as usize;
         } else {
             self.pointer += 3;
         }
     }
 
     fn jump_if_false(&mut self) {
-        if self.read(1) == 0 {
-            self.pointer = self.read(2) as usize;
+        if self.read(self.pointer, 1) == 0 {
+            self.pointer = self.read(self.pointer, 2) as usize;
         } else {
             self.pointer += 3;
         }
     }
 
     fn less_than(&mut self) {
-        self.write(3, if self.read(1) < self.read(2) { 1 } else { 0 });
+        self.write(
+            self.pointer + 3,
+            if self.read(self.pointer, 1) < self.read(self.pointer, 2) {
+                1
+            } else {
+                0
+            },
+        );
         self.pointer += 4;
     }
 
     fn equals(&mut self) {
-        self.write(3, if self.read(1) == self.read(2) { 1 } else { 0 });
+        self.write(
+            self.pointer + 3,
+            if self.read(self.pointer, 1) == self.read(self.pointer, 2) {
+                1
+            } else {
+                0
+            },
+        );
         self.pointer += 4;
     }
 
@@ -125,7 +146,10 @@ impl Intcode {
         self.finished
     }
 
-    pub fn run(&mut self, input: Vec<i32>) -> bool {
+    pub fn run<I>(&mut self, input: I) -> bool
+    where
+        I: Iterator<Item = i32>,
+    {
         for i in input {
             self.input.push_back(i);
         }
@@ -134,13 +158,8 @@ impl Intcode {
             match self.current() % 100 {
                 1 => self.add(),
                 2 => self.multiply(),
-                3 => {
-                    if self.input.len() > 0 {
-                        self.write_input()
-                    } else {
-                        break;
-                    }
-                }
+                3 if self.input.len() == 0 => break,
+                3 => self.write_input(),
                 4 => self.read_output(),
                 5 => self.jump_if_true(),
                 6 => self.jump_if_false(),
@@ -150,7 +169,7 @@ impl Intcode {
                     self.finished = true;
                     break;
                 }
-                x => panic!("Opcode '{}' in code '{}' is not valid.", x, self.current()),
+                c => panic!("Opcode '{}' in code '{}' is not valid.", c, self.current()),
             }
         }
 
@@ -166,11 +185,17 @@ fn parse_input() -> Vec<i32> {
         .collect()
 }
 
+fn start_amplifier(data: &Vec<i32>, phase: i32) -> Intcode {
+    let mut program = Intcode::from_vec(data);
+    program.run(once(phase));
+    program
+}
+
 fn run_amplifiers_once(data: &Vec<i32>, phase: Vec<i32>) -> i32 {
     let mut value: i32 = 0;
     for amp in 0usize..5 {
-        let mut program = Intcode::from_vec(data);
-        program.run(vec![phase[amp], value]);
+        let mut program = start_amplifier(data, phase[amp]);
+        program.run(once(value));
         value = program.pop_output().unwrap();
     }
     value
@@ -187,17 +212,11 @@ pub fn d07a() -> String {
 }
 
 fn run_amplifiers_loop(data: &Vec<i32>, phase: Vec<i32>) -> i32 {
-    let mut amplifiers: Vec<Intcode> = (0..5)
-        .map(|i| {
-            let mut p = Intcode::from_vec(&data);
-            p.run(vec![phase[i]]);
-            p
-        })
-        .collect();
+    let mut amplifiers: Vec<Intcode> = (0..5).map(|i| start_amplifier(data, phase[i])).collect();
     let mut signals: Vec<i32> = vec![0];
     loop {
         for i in 0..5 {
-            amplifiers[i].run(signals.clone());
+            amplifiers[i].run(signals.iter().map(|&s| s));
             signals = amplifiers[i].drain_output();
         }
         if amplifiers[4].finished() {
