@@ -30,6 +30,7 @@ fn format_duration(nanoseconds: u128, threshold: u128) -> String {
 }
 
 fn solve_problems(days: Vec<usize>) {
+    let mut total_elapsed: u128 = 0;
     for (i, day) in SOLVERS
         .iter()
         .enumerate()
@@ -39,15 +40,20 @@ fn solve_problems(days: Vec<usize>) {
             let now = Instant::now();
             let result = solver();
             let duration = now.elapsed().as_nanos();
+            let padding = if result.contains("\n") { "\n" } else { " " };
             println!(
-                "Day {}, part {}: {}. {}",
+                "Day {}, part {}:{}{}{}({})",
                 i + 1,
                 j + 1,
+                padding,
                 result,
+                padding,
                 format_duration(duration, 2000)
             );
+            total_elapsed += duration;
         }
     }
+    println!("\nTotal elapsed: {}", format_duration(total_elapsed, 2000));
 }
 
 fn main() {
