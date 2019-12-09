@@ -8,6 +8,8 @@ mod d06;
 mod d07;
 mod d08;
 
+mod intcode;
+
 use d01::{d01a, d01b};
 use d02::{d02a, d02b};
 use d03::{d03a, d03b};
