@@ -4,6 +4,7 @@ use std::collections::VecDeque;
 enum Mode {
     IMMEDIATE,
     POSITION,
+    RELATIVE,
 }
 
 #[derive(Debug)]
@@ -11,6 +12,7 @@ pub struct Intcode {
     state: Vec<i64>,
     input: VecDeque<i64>,
     output: VecDeque<i64>,
+    base: i64,
     pointer: usize,
     finished: bool,
 }
@@ -21,6 +23,7 @@ impl Intcode {
             state: initial.clone(),
             input: VecDeque::new(),
             output: VecDeque::new(),
+            base: 0,
             pointer: 0,
             finished: false,
         }
@@ -34,6 +37,7 @@ impl Intcode {
                 .collect(),
             input: VecDeque::new(),
             output: VecDeque::new(),
+            base: 0,
             pointer: 0,
             finished: false,
         }
@@ -45,40 +49,57 @@ impl Intcode {
 
     fn read_mode(&self, position: usize, index: usize) -> Mode {
         let modes = self.state[position] / 100;
-        if (modes / 10_i64.pow(index as u32)) % 10 > 0 {
-            Mode::IMMEDIATE
-        } else {
-            Mode::POSITION
-        }
-    }
-
-    fn read(&self, position: usize, offset: usize) -> i64 {
-        match self.read_mode(position, offset - 1) {
-            Mode::IMMEDIATE => self.state[position + offset],
-            Mode::POSITION if self.state[position] >= 0 => {
-                self.state[self.state[position + offset] as usize]
-            }
-            Mode::POSITION => panic!(
-                "Integer {} is to be used as index but is negative.",
-                self.state[position]
+        match (modes / 10_i64.pow(index as u32)) % 10 {
+            0 => Mode::POSITION,
+            1 => Mode::IMMEDIATE,
+            2 => Mode::RELATIVE,
+            m => panic!(
+                "{} within opcode {} is not a valid parameter.",
+                m, self.state[position]
             ),
         }
     }
 
-    fn write(&mut self, position: usize, value: i64) {
-        if self.state[position] < 0 {
+    fn read(&self, position: usize, offset: usize) -> i64 {
+        let value = self.state[position + offset];
+        match self.read_mode(position, offset - 1) {
+            Mode::IMMEDIATE => value,
+            Mode::POSITION if value >= 0 && (value as usize) < self.state.len() => {
+                self.state[value as usize]
+            }
+            Mode::POSITION if value >= 0 => 0,
+            Mode::POSITION => panic!("Integer {} is to be used as index but is negative.", value),
+            Mode::RELATIVE if value + self.base >= 0 => self.state[(value + self.base) as usize],
+            Mode::RELATIVE => panic!(
+                "Integer {} + base {} is to be used as index but is negative.",
+                value, self.base
+            ),
+        }
+    }
+
+    fn write(&mut self, position: usize, offset: usize, value: i64) {
+        let index_s = match self.read_mode(position, offset - 1) {
+            Mode::RELATIVE => self.state[position + offset] + self.base,
+            _ => self.state[position + offset],
+        };
+        if index_s < 0 {
             panic!(
-                "Integer {} is to be used as index but is negative.",
-                self.state[position]
+                "Integer {} plus offset {} is to be used as index but is negative.",
+                self.state[position + offset],
+                index_s - self.state[position + offset]
             );
         }
-        let index = self.state[position] as usize;
+        let index = index_s as usize;
+        if index >= self.state.len() {
+            self.state.resize(index + 1, 0);
+        }
         self.state[index] = value;
     }
 
     fn add(&mut self) {
         self.write(
-            self.pointer + 3,
+            self.pointer,
+            3,
             self.read(self.pointer, 1) + self.read(self.pointer, 2),
         );
         self.pointer += 4;
@@ -86,7 +107,8 @@ impl Intcode {
 
     fn multiply(&mut self) {
         self.write(
-            self.pointer + 3,
+            self.pointer,
+            3,
             self.read(self.pointer, 1) * self.read(self.pointer, 2),
         );
         self.pointer += 4;
@@ -94,7 +116,7 @@ impl Intcode {
 
     fn write_input(&mut self) {
         let v = self.input.pop_front().unwrap();
-        self.write(self.pointer + 1, v);
+        self.write(self.pointer, 1, v);
         self.pointer += 2;
     }
 
@@ -121,7 +143,8 @@ impl Intcode {
 
     fn less_than(&mut self) {
         self.write(
-            self.pointer + 3,
+            self.pointer,
+            3,
             if self.read(self.pointer, 1) < self.read(self.pointer, 2) {
                 1
             } else {
@@ -133,7 +156,8 @@ impl Intcode {
 
     fn equals(&mut self) {
         self.write(
-            self.pointer + 3,
+            self.pointer,
+            3,
             if self.read(self.pointer, 1) == self.read(self.pointer, 2) {
                 1
             } else {
@@ -141,6 +165,11 @@ impl Intcode {
             },
         );
         self.pointer += 4;
+    }
+
+    fn set_base(&mut self) {
+        self.base += self.read(self.pointer, 1);
+        self.pointer += 2;
     }
 
     pub fn drain(&mut self) -> impl Iterator<Item = i64> + '_ {
@@ -170,6 +199,7 @@ impl Intcode {
                 6 => self.jump_if_false(),
                 7 => self.less_than(),
                 8 => self.equals(),
+                9 => self.set_base(),
                 99 => {
                     self.finished = true;
                     break;
