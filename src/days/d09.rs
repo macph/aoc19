@@ -1,5 +1,5 @@
-/// Advent of Code 2019, day 8
-/// https://adventofcode.com/2019/day/8
+/// Advent of Code 2019, day 9
+/// https://adventofcode.com/2019/day/9
 use super::intcode::Intcode;
 use std::iter::once;
 
