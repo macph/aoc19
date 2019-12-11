@@ -144,7 +144,11 @@ impl Map {
         }
     }
 
-    fn find_in_sight(&self, position: (usize, usize), vector: (i32, i32)) -> Option<(usize, usize)> {
+    fn find_in_sight(
+        &self,
+        position: (usize, usize),
+        vector: (i32, i32),
+    ) -> Option<(usize, usize)> {
         let base = vector.reduce();
         let mut offset = base;
         loop {
