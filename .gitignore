@@ -1,4 +1,11 @@
+# Rust releases
 /target
+
+# Rustfmt backup files
 **/*.rs.bk
 
+# Perf reports
+perf.*
+
+# IntelliJ IDEA/PyCharm project files
 /.idea
