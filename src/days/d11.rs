@@ -1,5 +1,5 @@
-/// Advent of Code 2019, day 10
-/// https://adventofcode.com/2019/day/10
+/// Advent of Code 2019, day 11
+/// https://adventofcode.com/2019/day/11
 use itertools::Itertools;
 use std::collections::HashSet;
 use std::iter::{empty, once};
