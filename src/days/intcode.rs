@@ -172,6 +172,10 @@ impl Intcode {
         self.pointer += 2;
     }
 
+    pub fn set_value(&mut self, position: usize, value: i64) {
+        self.state[position] = value;
+    }
+
     pub fn drain(&mut self) -> impl Iterator<Item = i64> + '_ {
         self.output.drain(..)
     }
