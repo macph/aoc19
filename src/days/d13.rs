@@ -54,10 +54,7 @@ impl Screen {
     }
 
     fn blocks(&self) -> usize {
-        self.tiles
-            .iter()
-            .filter(|(_, &t)| t == Tile::Block)
-            .count()
+        self.tiles.iter().filter(|(_, &t)| t == Tile::Block).count()
     }
 
     fn set(&mut self, x: i64, y: i64, t: i64) {
@@ -139,7 +136,7 @@ pub fn d13b() -> String {
                 match Tile::from(o[2]) {
                     Tile::Ball => ball = (o[0], o[1]),
                     Tile::Paddle => paddle = (o[0], o[1]),
-                    _ => ()
+                    _ => (),
                 }
             }
             screen.set(o[0], o[1], o[2]);
