@@ -1,5 +1,7 @@
 /// The Intcode computer used by several problems
 use std::collections::VecDeque;
+use std::num::ParseIntError;
+use std::str::FromStr;
 
 enum Mode {
     IMMEDIATE,
@@ -18,23 +20,9 @@ pub struct Intcode {
 }
 
 impl Intcode {
-    pub fn from_vec(initial: &Vec<i64>) -> Intcode {
-        Intcode {
-            state: initial.clone(),
-            input: VecDeque::new(),
-            output: VecDeque::new(),
-            base: 0,
-            pointer: 0,
-            finished: false,
-        }
-    }
-
-    pub fn from_string(string: String) -> Intcode {
-        Intcode {
-            state: string
-                .split(',')
-                .map(|i| i.parse::<i64>().unwrap())
-                .collect(),
+    pub fn new(state: Vec<i64>) -> Self {
+        Self {
+            state,
             input: VecDeque::new(),
             output: VecDeque::new(),
             base: 0,
@@ -221,5 +209,17 @@ impl Iterator for Intcode {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.output.pop_front()
+    }
+}
+
+impl FromStr for Intcode {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let state = s
+            .split(',')
+            .map(|i| i.parse::<i64>())
+            .collect::<Result<Vec<i64>, ParseIntError>>()?;
+        Ok(Self::new(state))
     }
 }

@@ -1,11 +1,13 @@
 /// Advent of Code 2019, day 5
 /// https://adventofcode.com/2019/day/5
-use super::intcode::Intcode;
 use std::iter::once;
+use std::str::from_utf8;
+
+use super::intcode::Intcode;
 
 fn setup_intcode() -> Intcode {
     let data = include_bytes!("input/d05.txt");
-    Intcode::from_string(String::from_utf8_lossy(data).to_string())
+    from_utf8(data).unwrap().parse::<Intcode>().unwrap()
 }
 
 fn run_intcode(value: i64) -> i64 {

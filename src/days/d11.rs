@@ -3,6 +3,7 @@
 use itertools::Itertools;
 use std::collections::HashSet;
 use std::iter::{empty, once};
+use std::str::from_utf8;
 
 use super::intcode::Intcode;
 
@@ -117,7 +118,7 @@ fn to_bool(v: i64) -> bool {
 
 fn setup_intcode() -> Intcode {
     let data = include_bytes!("input/d11.txt");
-    Intcode::from_string(String::from_utf8_lossy(data).to_string())
+    from_utf8(data).unwrap().parse::<Intcode>().unwrap()
 }
 
 fn paint_hull(initial: impl Iterator<Item = Square>) -> Panel {

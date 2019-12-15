@@ -1,21 +1,23 @@
 /// Advent of Code 2019, day 9
 /// https://adventofcode.com/2019/day/9
-use super::intcode::Intcode;
 use std::iter::once;
+use std::str::from_utf8;
 
-fn setup_intcode() -> Intcode {
+use super::intcode::Intcode;
+
+fn get_data<'a>() -> &'a str {
     let data = include_bytes!("input/d09.txt");
-    Intcode::from_string(String::from_utf8_lossy(data).to_string())
+    from_utf8(data).unwrap()
 }
 
 pub fn d09a() -> String {
-    let mut program = setup_intcode();
+    let mut program = get_data().parse::<Intcode>().unwrap();
     program.run(once(1));
     program.nth(0).unwrap().to_string()
 }
 
 pub fn d09b() -> String {
-    let mut program = setup_intcode();
+    let mut program = get_data().parse::<Intcode>().unwrap();
     program.run(once(2));
     program.nth(0).unwrap().to_string()
 }
@@ -34,17 +36,17 @@ mod test {
 
     #[test]
     fn test_program_1() {
-        let data = parse("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99");
-        let mut program = Intcode::from_vec(&data);
+        let data = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99";
+        let mut program = data.parse::<Intcode>().unwrap();
         program.run(empty());
 
-        assert_eq!(program.collect::<Vec<i64>>(), data);
+        assert_eq!(program.collect::<Vec<i64>>(), parse(data));
     }
 
     #[test]
     fn test_program_2() {
-        let data = parse("1102,34915192,34915192,7,4,7,99,0");
-        let mut program = Intcode::from_vec(&data);
+        let data = "1102,34915192,34915192,7,4,7,99,0";
+        let mut program = data.parse::<Intcode>().unwrap();
         program.run(empty());
         let value = program.nth(0).unwrap();
 
@@ -53,10 +55,10 @@ mod test {
 
     #[test]
     fn test_program_3() {
-        let data = parse("104,1125899906842624,99");
-        let mut program = Intcode::from_vec(&data);
+        let data = "104,1125899906842624,99";
+        let mut program = data.parse::<Intcode>().unwrap();
         program.run(empty());
 
-        assert_eq!(program.nth(0).unwrap(), data[1]);
+        assert_eq!(program.nth(0).unwrap(), parse(data)[1]);
     }
 }

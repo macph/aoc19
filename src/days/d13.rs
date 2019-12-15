@@ -1,8 +1,10 @@
 /// Advent of Code 2019, day 13
 /// https://adventofcode.com/2019/day/13
-use super::intcode::Intcode;
 use std::collections::HashMap;
 use std::iter::{empty, once};
+use std::str::from_utf8;
+
+use super::intcode::Intcode;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Tile {
@@ -99,7 +101,7 @@ impl Screen {
 
 fn setup_intcode() -> Intcode {
     let data = include_bytes!("input/d13.txt");
-    Intcode::from_string(String::from_utf8_lossy(data).to_string())
+    from_utf8(data).unwrap().parse::<Intcode>().unwrap()
 }
 
 pub fn d13a() -> String {
