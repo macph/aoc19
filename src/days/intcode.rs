@@ -9,7 +9,7 @@ enum Mode {
     RELATIVE,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Intcode {
     state: Vec<i64>,
     input: VecDeque<i64>,
