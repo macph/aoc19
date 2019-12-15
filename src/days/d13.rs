@@ -43,6 +43,7 @@ struct Screen {
     score: i64,
 }
 
+#[allow(dead_code)]
 impl Screen {
     fn new() -> Self {
         Self {
