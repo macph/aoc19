@@ -3,6 +3,7 @@ extern crate clap;
 #[macro_use]
 extern crate lazy_static;
 
+use std::iter::once;
 use std::time::Instant;
 
 use clap::{App, Arg};
@@ -57,25 +58,46 @@ fn solve_problems(days: Vec<usize>) {
 }
 
 fn main() {
-    let d = SOLVERS.len();
+    let num_days = SOLVERS.len();
     let app = App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!("\n"))
         .about(crate_description!())
         .arg(
+            Arg::with_name("last")
+                .long("last")
+                .help("Run the last day only."),
+        )
+        .arg(
             Arg::with_name("DAY")
                 .help("Select days to calculate solutions for.")
                 .multiple(true)
                 .validator(move |v| match v.parse::<usize>() {
-                    Ok(v) if v > 0 && v <= d => Ok(()),
-                    _ => Err(format!("Argument must be in range [1, {}]", d)),
+                    Ok(v) if v > 0 && v <= num_days => Ok(()),
+                    _ => Err(format!("Argument must be in range [1, {}]", num_days)),
                 }),
         );
 
     let matches = app.get_matches();
-    let days: Vec<usize> = match matches.values_of("DAY") {
-        Some(d) => d.map(|x| x.parse::<usize>().unwrap()).collect(),
-        None => (1..=d).collect(),
+    let last = matches.is_present("last");
+    let selected = matches.values_of("DAY");
+
+    let days = if selected.is_some() && !last {
+        selected
+            .unwrap()
+            .map(|x| x.parse::<usize>().unwrap())
+            .collect()
+    } else if selected.is_some() {
+        selected
+            .unwrap()
+            .rev()
+            .take(1)
+            .map(|x| x.parse::<usize>().unwrap())
+            .collect()
+    } else if !last {
+        (1..=num_days).collect()
+    } else {
+        once(num_days).collect()
     };
 
     solve_problems(days);
