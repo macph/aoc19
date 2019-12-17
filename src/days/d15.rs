@@ -27,7 +27,7 @@ impl Status {
             0 => Status::Wall,
             1 => Status::Empty,
             2 => Status::OxygenSystem,
-            x => panic!("Output must be in range [0, 2], received {:?}", x)
+            x => panic!("Output must be in range [0, 2], received {:?}", x),
         }
     }
 
@@ -60,7 +60,7 @@ impl Direction {
             Direction::North,
             Direction::South,
             Direction::West,
-            Direction::East
+            Direction::East,
         ];
         DIR.iter()
     }
