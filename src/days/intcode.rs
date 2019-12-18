@@ -50,6 +50,7 @@ impl Intcode {
 
     fn read(&self, position: usize, offset: usize) -> i64 {
         let value = self.state[position + offset];
+        let rel_value = value + self.base;
         match self.read_mode(position, offset - 1) {
             Mode::IMMEDIATE => value,
             Mode::POSITION if value >= 0 && (value as usize) < self.state.len() => {
@@ -57,7 +58,10 @@ impl Intcode {
             }
             Mode::POSITION if value >= 0 => 0,
             Mode::POSITION => panic!("Integer {} is to be used as index but is negative.", value),
-            Mode::RELATIVE if value + self.base >= 0 => self.state[(value + self.base) as usize],
+            Mode::RELATIVE if rel_value >= 0 && (rel_value as usize) < self.state.len() => {
+                self.state[rel_value as usize]
+            }
+            Mode::RELATIVE if rel_value >= 0 => 0,
             Mode::RELATIVE => panic!(
                 "Integer {} + base {} is to be used as index but is negative.",
                 value, self.base
