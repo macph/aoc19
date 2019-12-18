@@ -18,22 +18,22 @@ mod d16;
 
 mod intcode;
 
-use d01::{d01a, d01b};
-use d02::{d02a, d02b};
-use d03::{d03a, d03b};
-use d04::{d04a, d04b};
-use d05::{d05a, d05b};
-use d06::{d06a, d06b};
-use d07::{d07a, d07b};
-use d08::{d08a, d08b};
-use d09::{d09a, d09b};
-use d10::{d10a, d10b};
-use d11::{d11a, d11b};
-use d12::{d12a, d12b};
-use d13::{d13a, d13b};
-use d14::{d14a, d14b};
-use d15::{d15a, d15b};
-use d16::{d16a, d16b};
+use d01::*;
+use d02::*;
+use d03::*;
+use d04::*;
+use d05::*;
+use d06::*;
+use d07::*;
+use d08::*;
+use d09::*;
+use d10::*;
+use d11::*;
+use d12::*;
+use d13::*;
+use d14::*;
+use d15::*;
+use d16::*;
 
 pub type Solver = dyn Fn() -> String + Send + Sync + 'static;
 
