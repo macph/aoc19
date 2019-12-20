@@ -16,6 +16,7 @@ mod d14;
 mod d15;
 mod d16;
 mod d17;
+mod d18;
 
 mod intcode;
 
@@ -36,6 +37,7 @@ use d14::*;
 use d15::*;
 use d16::*;
 use d17::*;
+use d18::*;
 
 pub type Solver = dyn Fn() -> String + Send + Sync + 'static;
 
@@ -58,5 +60,6 @@ lazy_static! {
         vec![&d15a, &d15b],
         vec![&d16a, &d16b],
         vec![&d17a, &d17b],
+        vec![&d18a, &d18b],
     ];
 }
