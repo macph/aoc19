@@ -2,10 +2,10 @@
 /// https://adventofcode.com/2019/day/18
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
-use std::fmt;
+use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
+use std::hash::Hash;
 use std::iter::{once, FromIterator};
 use std::str::{from_utf8, FromStr};
-use std::usize;
 
 fn char_to_u32(c: char) -> Option<u32> {
     if c.is_ascii_uppercase() {
@@ -70,8 +70,8 @@ impl Keys {
     }
 }
 
-impl fmt::Display for Keys {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Display for Keys {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "[")?;
         for i in 0..self.bits() as u32 {
             let c = char_from_u32(i).unwrap();
@@ -88,8 +88,8 @@ enum MapParseError {
     NoEntrance,
 }
 
-impl fmt::Display for MapParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Display for MapParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
             MapParseError::FeatureParseError(c) => write!(
                 f,
@@ -131,8 +131,8 @@ impl Feature {
     }
 }
 
-impl fmt::Display for Feature {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Display for Feature {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         let c = match self {
             Feature::Entrance => '@',
             Feature::Wall => '#',
@@ -225,8 +225,8 @@ impl Map {
     }
 }
 
-impl fmt::Display for Map {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Display for Map {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         for ls in self.features.chunks(self.width) {
             for (i, feature) in ls.iter().enumerate() {
                 write!(f, "{}", feature)?;
@@ -287,22 +287,22 @@ impl<'a> Iterator for MapBFS<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         let mut found: Option<Self::Item> = None;
         while found.is_none() {
-            let (p0, count, k) = self.queue.pop_back()?;
-            for p in self.map.adjacent(p0) {
-                if self.visited.contains(&p) {
+            let (pos, dist, keys) = self.queue.pop_back()?;
+            for adj in self.map.adjacent(pos) {
+                if self.visited.contains(&adj) {
                     continue;
                 }
-                self.visited.insert(p);
-                match self.map.features[p] {
+                self.visited.insert(adj);
+                match self.map.features[adj] {
                     Feature::Key(c) => {
-                        found = Some((p, count + 1, k));
-                        self.queue.push_front((p, count + 1, k.with(c)));
+                        found = Some((adj, dist + 1, keys));
+                        self.queue.push_front((adj, dist + 1, keys.with(c)));
                     }
                     Feature::Door(c) => {
-                        self.queue.push_front((p, count + 1, k.with(c)));
+                        self.queue.push_front((adj, dist + 1, keys.with(c)));
                     }
                     f if f.passable() => {
-                        self.queue.push_front((p, count + 1, k));
+                        self.queue.push_front((adj, dist + 1, keys));
                     }
                     _ => (),
                 }
@@ -322,23 +322,48 @@ fn build_adj_matrix(map: &Map) -> HashMap<usize, HashMap<usize, (Keys, usize)>> 
             Feature::Key(_) => Some(i),
             _ => None,
         });
-    for p in map.entrances().iter().cloned().chain(iter_keys) {
-        for (q, c, k) in map.find_keys(p) {
-            matrix.entry(p).or_insert(HashMap::new()).insert(q, (k, c));
+    for start in map.entrances().iter().cloned().chain(iter_keys) {
+        for (pos, dist, keys) in map.find_keys(start) {
+            matrix
+                .entry(start)
+                .or_insert(HashMap::new())
+                .insert(pos, (keys, dist));
         }
     }
     matrix
 }
 
+trait Position: Sized + Debug + Copy + Eq + Hash + AsRef<[usize]> + AsMut<[usize]> {
+    fn from_vec(v: Vec<usize>) -> Self;
+}
+
+impl Position for [usize; 1] {
+    fn from_vec(v: Vec<usize>) -> Self {
+        if v.len() != 1 {
+            panic!("expected vec of size 1; got {}", v.len());
+        }
+        [v[0]]
+    }
+}
+
+impl Position for [usize; 4] {
+    fn from_vec(v: Vec<usize>) -> Self {
+        if v.len() != 4 {
+            panic!("expected vec of size 4; got {}", v.len());
+        }
+        [v[0], v[1], v[2], v[3]]
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
-struct Path {
-    position: usize,
+struct Path<P: Position> {
+    position: P,
     dist: usize,
     keys: Keys,
 }
 
-impl Path {
-    fn new(position: usize, dist: usize, keys: Keys) -> Self {
+impl<P: Position> Path<P> {
+    fn new(position: P, dist: usize, keys: Keys) -> Self {
         Self {
             position,
             dist,
@@ -347,43 +372,44 @@ impl Path {
     }
 }
 
-impl Ord for Path {
+impl<P: Position> Ord for Path<P> {
     fn cmp(&self, other: &Self) -> Ordering {
         other.dist.cmp(&self.dist)
     }
 }
 
-impl PartialOrd for Path {
+impl<P: Position> PartialOrd for Path<P> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-fn map_dijkstra(map: &Map) -> Option<usize> {
+fn map_dijkstra<P: Position>(map: &Map) -> Option<usize> {
     let src = map.entrances();
+
     let matrix = build_adj_matrix(map);
+    let mut heap = BinaryHeap::<Path<P>>::new();
+    let mut dist = HashMap::<(Keys, P), usize>::new();
 
-    let mut heap = BinaryHeap::<Path>::new();
-    let mut dist = HashMap::<(Keys, usize), usize>::new();
-
-    for &i in matrix.keys() {
-        let new_keys = Keys::new();
-        let new_dist = if src.contains(&i) { 0 } else { usize::MAX };
-        heap.push(Path::new(i, new_dist, Keys::new()));
-        dist.insert((new_keys, i), new_dist);
-    }
+    let src_a = P::from_vec(src);
+    heap.push(Path::new(src_a, 0, Keys::new()));
+    dist.insert((Keys::new(), src_a), 0);
 
     while let Some(path) = heap.pop() {
-        for (q, (k, d)) in matrix[&path.position].iter() {
-            let c = map.get_key(*q).unwrap();
-            if path.keys.has(c) || !path.keys.is_subset(*k) {
-                continue;
-            }
-            let new = Path::new(*q, path.dist.saturating_add(*d), path.keys.with(c));
-            let key = (new.keys, new.position);
-            if !dist.contains_key(&key) || new.dist < dist[&key] {
-                dist.insert((new.keys, new.position), new.dist);
-                heap.push(new);
+        for (i, p) in path.position.as_ref().iter().enumerate() {
+            for (pos, (keys, d)) in matrix[p].iter() {
+                let c = map.get_key(*pos).unwrap();
+                if path.keys.has(c) || !path.keys.is_subset(*keys) {
+                    continue;
+                }
+                let mut new_pos = path.position;
+                new_pos.as_mut()[i] = *pos;
+                let new = Path::new(new_pos, path.dist.saturating_add(*d), path.keys.with(c));
+                let key = (new.keys, new.position);
+                if !dist.contains_key(&key) || new.dist < dist[&key] {
+                    dist.insert((new.keys, new.position), new.dist);
+                    heap.push(new);
+                }
             }
         }
     }
@@ -402,31 +428,13 @@ fn parse_map() -> Map {
 }
 
 pub fn d18a() -> String {
-    map_dijkstra(&parse_map()).unwrap().to_string()
+    map_dijkstra::<[usize; 1]>(&parse_map())
+        .unwrap()
+        .to_string()
 }
 
 pub fn d18b() -> String {
     let mut map = parse_map();
     map.replace_entrance();
-    println!("{}", map);
-    println!("{:?}", build_adj_matrix(&map));
-    "".to_string()
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_shortest_path() {
-        let data = "\
-                    ########################\n\
-                    #@..............ac.GI.b#\n\
-                    ###d#e#f################\n\
-                    ###A#B#C################\n\
-                    ###g#h#i################\n\
-                    ########################";
-        let map = data.parse::<Map>().unwrap();
-        assert_eq!(map_dijkstra(&map), Some(81));
-    }
+    map_dijkstra::<[usize; 4]>(&map).unwrap().to_string()
 }
