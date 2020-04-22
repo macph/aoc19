@@ -33,7 +33,7 @@ fn iter_digits(integer: u32) -> IterDigits {
     }
 }
 
-pub fn d04a() -> String {
+pub fn part_a() -> String {
     (MIN..=MAX)
         .filter(|&pw| {
             let mut p: Option<u8> = None;
@@ -55,7 +55,7 @@ pub fn d04a() -> String {
         .to_string()
 }
 
-pub fn d04b() -> String {
+pub fn part_b() -> String {
     (MIN..=MAX)
         .filter(|&pw| {
             let mut p: Option<u8> = None;

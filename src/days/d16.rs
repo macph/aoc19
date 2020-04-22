@@ -84,12 +84,12 @@ fn parse_input() -> Vec<S> {
         .collect()
 }
 
-pub fn d16a() -> String {
+pub fn part_a() -> String {
     let data = apply_transform(&parse_input(), CYCLES, 1, 0);
     data[..8].iter().join("")
 }
 
-pub fn d16b() -> String {
+pub fn part_b() -> String {
     let data: Vec<S> = apply_transform(&parse_input(), CYCLES, MULTIPLIER, OFFSET);
     data[..8].iter().join("")
 }

@@ -120,7 +120,7 @@ fn simulate_system_step(moons: &mut Vec<Moon>) {
     }
 }
 
-pub fn d12a() -> String {
+pub fn part_a() -> String {
     let mut moons = parse_input();
     for _ in 0..1000 {
         simulate_system_step(&mut moons);
@@ -157,7 +157,7 @@ fn z_velocity_zero(moons: &Vec<Moon>) -> bool {
     moons.iter().all(|m| m.velocity.2 == 0)
 }
 
-pub fn d12b() -> String {
+pub fn part_b() -> String {
     let mut moons = parse_input();
     let initial = (x_coords(&moons), y_coords(&moons), z_coords(&moons));
 

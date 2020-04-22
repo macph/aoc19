@@ -17,10 +17,10 @@ fn run_intcode(value: i64) -> i64 {
     output[output.len() - 1]
 }
 
-pub fn d05a() -> String {
+pub fn part_a() -> String {
     run_intcode(1).to_string()
 }
 
-pub fn d05b() -> String {
+pub fn part_b() -> String {
     run_intcode(5).to_string()
 }

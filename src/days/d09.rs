@@ -10,13 +10,13 @@ fn get_data<'a>() -> &'a str {
     from_utf8(data).unwrap()
 }
 
-pub fn d09a() -> String {
+pub fn part_a() -> String {
     let mut program = get_data().parse::<Intcode>().unwrap();
     program.run(once(1));
     program.nth(0).unwrap().to_string()
 }
 
-pub fn d09b() -> String {
+pub fn part_b() -> String {
     let mut program = get_data().parse::<Intcode>().unwrap();
     program.run(once(2));
     program.nth(0).unwrap().to_string()

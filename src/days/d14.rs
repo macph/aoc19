@@ -180,12 +180,12 @@ fn parse_input<'a>() -> Collection {
     Collection::new(recipes)
 }
 
-pub fn d14a() -> String {
+pub fn part_a() -> String {
     let result = parse_input().total_raw(&Material::new("FUEL".to_string(), 1));
     result[0].quantity.to_string()
 }
 
-pub fn d14b() -> String {
+pub fn part_b() -> String {
     let collection = &parse_input();
     let sorted = collection.sorted();
     let fuel = "FUEL".to_string();

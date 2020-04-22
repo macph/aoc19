@@ -427,13 +427,13 @@ fn parse_map() -> Map {
     from_utf8(data).unwrap().parse::<Map>().unwrap()
 }
 
-pub fn d18a() -> String {
+pub fn part_a() -> String {
     map_dijkstra::<[usize; 1]>(&parse_map())
         .unwrap()
         .to_string()
 }
 
-pub fn d18b() -> String {
+pub fn part_b() -> String {
     let mut map = parse_map();
     map.replace_entrance();
     map_dijkstra::<[usize; 4]>(&map).unwrap().to_string()

@@ -140,11 +140,11 @@ fn count_edges(g: &Graph<String>, start: &String) -> usize {
         .sum::<usize>()
 }
 
-pub fn d06a() -> String {
+pub fn part_a() -> String {
     count_edges(&parse_graph(), &"COM".to_string()).to_string()
 }
 
-pub fn d06b() -> String {
+pub fn part_b() -> String {
     let g = parse_graph();
     let y = "YOU".to_string();
     let s = "SAN".to_string();

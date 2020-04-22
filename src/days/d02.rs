@@ -39,11 +39,11 @@ fn run_program(initial: Vec<usize>, noun: usize, verb: usize) -> Vec<usize> {
     state
 }
 
-pub fn d02a() -> String {
+pub fn part_a() -> String {
     run_program(parse_input(), 12, 2)[0].to_string()
 }
 
-pub fn d02b() -> String {
+pub fn part_b() -> String {
     let (noun, verb) = (0usize..100)
         .flat_map(|j| (0usize..100).map(move |i| (i, j)))
         .find(|(n, v)| run_program(parse_input(), *n, *v)[0] == 19690720)

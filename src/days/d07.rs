@@ -33,7 +33,7 @@ fn run_amplifiers(data: &str, phase: Vec<i64>) -> i64 {
     signals[0]
 }
 
-pub fn d07a() -> String {
+pub fn part_a() -> String {
     let data = get_data();
     (0..5)
         .permutations(5)
@@ -43,7 +43,7 @@ pub fn d07a() -> String {
         .to_string()
 }
 
-pub fn d07b() -> String {
+pub fn part_b() -> String {
     let data = get_data();
     (5..10)
         .permutations(5)

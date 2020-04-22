@@ -105,7 +105,7 @@ fn setup_intcode() -> Intcode {
     from_utf8(data).unwrap().parse::<Intcode>().unwrap()
 }
 
-pub fn d13a() -> String {
+pub fn part_a() -> String {
     let mut program = setup_intcode();
     let mut screen = Screen::new();
     program.run(empty());
@@ -115,7 +115,7 @@ pub fn d13a() -> String {
     screen.blocks().to_string()
 }
 
-pub fn d13b() -> String {
+pub fn part_b() -> String {
     let mut program = setup_intcode();
     let mut screen = Screen::new();
     program.set_value(0, 2);

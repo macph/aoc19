@@ -18,7 +18,7 @@ fn read_input() -> Vec<u8> {
     data.iter().map(|&i| byte_to_int(i)).collect()
 }
 
-pub fn d08a() -> String {
+pub fn part_a() -> String {
     let layer = read_input()
         .chunks(WIDTH * HEIGHT)
         .min_by_key(|layer| layer.iter().filter(|&&i| i == 0).count())
@@ -29,7 +29,7 @@ pub fn d08a() -> String {
     (ones * twos).to_string()
 }
 
-pub fn d08b() -> String {
+pub fn part_b() -> String {
     let layers: Vec<Vec<u8>> = read_input()
         .chunks(WIDTH * HEIGHT)
         .map(|layer| layer.to_vec())

@@ -144,10 +144,10 @@ fn paint_hull(initial: impl Iterator<Item = Square>) -> Panel {
     panel
 }
 
-pub fn d11a() -> String {
+pub fn part_a() -> String {
     paint_hull(empty()).total_painted().to_string()
 }
 
-pub fn d11b() -> String {
+pub fn part_b() -> String {
     paint_hull(once((0, 0))).render().unwrap()
 }

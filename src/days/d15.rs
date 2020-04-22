@@ -151,12 +151,12 @@ fn find_oxygen_system(code: &Intcode) -> Option<Droid> {
     }
 }
 
-pub fn d15a() -> String {
+pub fn part_a() -> String {
     let code = setup_intcode();
     find_oxygen_system(&code).unwrap().travelled.to_string()
 }
 
-pub fn d15b() -> String {
+pub fn part_b() -> String {
     let code = setup_intcode();
     let mut start = find_oxygen_system(&code).unwrap();
     start.reset();

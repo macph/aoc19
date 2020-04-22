@@ -126,7 +126,7 @@ fn parse_input() -> Vec<Vec<Move>> {
         .collect()
 }
 
-pub fn d03a() -> String {
+pub fn part_a() -> String {
     let mut g = Grid::new();
     for w in parse_input().iter() {
         g.add_wire(w);
@@ -139,7 +139,7 @@ pub fn d03a() -> String {
         .to_string()
 }
 
-pub fn d03b() -> String {
+pub fn part_b() -> String {
     let mut g = Grid::new();
     for w in parse_input().iter() {
         g.add_wire(w);

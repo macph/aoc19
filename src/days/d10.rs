@@ -199,11 +199,11 @@ fn parse_input() -> Map {
     parse_string(String::from_utf8_lossy(data).to_string())
 }
 
-pub fn d10a() -> String {
+pub fn part_a() -> String {
     find_best_los(&parse_input()).1.to_string()
 }
 
-pub fn d10b() -> String {
+pub fn part_b() -> String {
     let mut map = parse_input();
     let position: (usize, usize) = (31, 20);
     let vectors = los_clockwise(position, map.width(), map.height());

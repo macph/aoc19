@@ -155,7 +155,7 @@ fn setup_intcode() -> Intcode {
     from_utf8(data).unwrap().parse::<Intcode>().unwrap()
 }
 
-pub fn d17a() -> String {
+pub fn part_a() -> String {
     let mut program = setup_intcode();
     program.run(empty());
     let scaffold = Scaffold::from_output(program.drain());
@@ -172,7 +172,7 @@ fn stream_chars(s: &str) -> impl Iterator<Item = i64> + '_ {
     s.chars().map(|c| c as u8 as i64)
 }
 
-pub fn d17b() -> String {
+pub fn part_b() -> String {
     let mut program = setup_intcode();
 
     program.set_value(0, 2);

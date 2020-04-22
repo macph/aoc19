@@ -13,7 +13,7 @@ fn fuel_required(mass: i32) -> i32 {
     mass / 3 - 2
 }
 
-pub fn d01a() -> String {
+pub fn part_a() -> String {
     parse_input()
         .iter()
         .map(|&mass| fuel_required(mass))
@@ -21,7 +21,7 @@ pub fn d01a() -> String {
         .to_string()
 }
 
-pub fn d01b() -> String {
+pub fn part_b() -> String {
     parse_input()
         .iter()
         .map(|&mass| {

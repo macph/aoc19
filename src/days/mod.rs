@@ -20,46 +20,27 @@ mod d18;
 
 mod intcode;
 
-use d01::*;
-use d02::*;
-use d03::*;
-use d04::*;
-use d05::*;
-use d06::*;
-use d07::*;
-use d08::*;
-use d09::*;
-use d10::*;
-use d11::*;
-use d12::*;
-use d13::*;
-use d14::*;
-use d15::*;
-use d16::*;
-use d17::*;
-use d18::*;
-
 pub type Solver = dyn Fn() -> String + Send + Sync + 'static;
 
 lazy_static! {
     pub static ref SOLVERS: Vec<Vec<&'static Solver>> = vec![
-        vec![&d01a, &d01b],
-        vec![&d02a, &d02b],
-        vec![&d03a, &d03b],
-        vec![&d04a, &d04b],
-        vec![&d05a, &d05b],
-        vec![&d06a, &d06b],
-        vec![&d07a, &d07b],
-        vec![&d08a, &d08b],
-        vec![&d09a, &d09b],
-        vec![&d10a, &d10b],
-        vec![&d11a, &d11b],
-        vec![&d12a, &d12b],
-        vec![&d13a, &d13b],
-        vec![&d14a, &d14b],
-        vec![&d15a, &d15b],
-        vec![&d16a, &d16b],
-        vec![&d17a, &d17b],
-        vec![&d18a, &d18b],
+        vec![&d01::part_a, &d01::part_b],
+        vec![&d02::part_a, &d02::part_b],
+        vec![&d03::part_a, &d03::part_b],
+        vec![&d04::part_a, &d04::part_b],
+        vec![&d05::part_a, &d05::part_b],
+        vec![&d06::part_a, &d06::part_b],
+        vec![&d07::part_a, &d07::part_b],
+        vec![&d08::part_a, &d08::part_b],
+        vec![&d09::part_a, &d09::part_b],
+        vec![&d10::part_a, &d10::part_b],
+        vec![&d11::part_a, &d11::part_b],
+        vec![&d12::part_a, &d12::part_b],
+        vec![&d13::part_a, &d13::part_b],
+        vec![&d14::part_a, &d14::part_b],
+        vec![&d15::part_a, &d15::part_b],
+        vec![&d16::part_a, &d16::part_b],
+        vec![&d17::part_a, &d17::part_b],
+        vec![&d18::part_a, &d18::part_b],
     ];
 }
