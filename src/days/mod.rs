@@ -18,6 +18,7 @@ mod d16;
 mod d17;
 mod d18;
 mod d19;
+mod d20;
 
 mod intcode;
 
@@ -44,5 +45,6 @@ lazy_static! {
         vec![&d17::part_a, &d17::part_b],
         vec![&d18::part_a, &d18::part_b],
         vec![&d19::part_a, &d19::part_b],
+        vec![&d20::part_a, &d20::part_b],
     ];
 }
